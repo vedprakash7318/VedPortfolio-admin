@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+/* 
+  Custom CSS Rules:
+  - Use unique class names.
+  - Prefix class names with the file name (e.g., Login_container).
+*/
+@theme {
+  --color-primary: #3b82f6; /* Example custom color */
+}
