@@ -64,13 +64,13 @@ const Login = () => {
                             required
                         />
                     </div>
-                    <Button
+                    <button
                         type="submit"
                         loading={false} // Login component doesn't have a loading state variable exposed in the snippet, need to check context
                         className="Login_button w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-2 px-4 rounded transition-all transform hover:scale-[1.02]"
                     >
                         Sign In
-                    </Button>
+                    </button>
                 </form>
             </motion.div>
         </div>
