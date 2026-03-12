@@ -5,6 +5,8 @@ import { FaPlus, FaEdit, FaTrash, FaTimes, FaTools } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import Button from '../components/ui/Button';
+import Swal from 'sweetalert2';
+import { toast } from 'react-toastify';
 
 const Services = () => {
     const [services, setServices] = useState([]);
@@ -52,28 +54,52 @@ const Services = () => {
         try {
             if (editingService) {
                 await api.put(`/api/services/${editingService._id}`, formData, config);
+                toast.success('Service updated successfully!');
             } else {
                 await api.post('/api/services', formData, config);
-                closeModal();
-                fetchServices();
+                toast.success('Service created successfully!');
             }
+            closeModal();
+            fetchServices();
         } catch (error) {
             console.error(error);
-            alert('Error saving service');
+            toast.error('Error saving service');
         } finally {
             setSubmitting(false);
         }
     };
 
     const handleDelete = async (id) => {
-        if (window.confirm('Are you sure you want to delete this service?')) {
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        });
+
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Deleting...',
+                text: 'Please wait',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
             try {
                 await api.delete(`/api/services/${id}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 fetchServices();
+                Swal.close();
+                toast.success('Service deleted successfully!');
             } catch (error) {
                 console.error(error);
+                Swal.close();
+                toast.error('Failed to delete service');
             }
         }
     };

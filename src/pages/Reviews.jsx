@@ -3,6 +3,8 @@ import api from '../api/axiosInstance';
 import { useAuth } from '../context/AuthContext';
 import { FaCheck, FaTimes, FaTrash, FaStar } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
+import Swal from 'sweetalert2';
+import { toast } from 'react-toastify';
 
 const Reviews = () => {
     const [reviews, setReviews] = useState([]);
@@ -33,20 +35,44 @@ const Reviews = () => {
                 headers: { Authorization: `Bearer ${token}` },
             });
             fetchReviews();
+            toast.success('Review status updated!');
         } catch (error) {
             console.error(error);
+            toast.error('Failed to update review status');
         }
     };
 
     const handleDelete = async (id) => {
-        if (window.confirm('Are you sure you want to delete this review?')) {
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        });
+
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Deleting...',
+                text: 'Please wait',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
             try {
                 await api.delete(`/api/reviews/${id}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 fetchReviews();
+                Swal.close();
+                toast.success('Review deleted successfully!');
             } catch (error) {
                 console.error(error);
+                Swal.close();
+                toast.error('Failed to delete review');
             }
         }
     };

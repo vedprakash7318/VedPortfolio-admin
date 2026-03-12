@@ -3,6 +3,7 @@ import api from '../api/axiosInstance';
 import { useAuth } from '../context/AuthContext';
 import { FaSave, FaUpload } from 'react-icons/fa';
 import Button from '../components/ui/Button';
+import { toast } from 'react-toastify';
 
 const Settings = () => {
     const { user } = useAuth();
@@ -16,7 +17,7 @@ const Settings = () => {
         whatsapp: '',
         github: '',
         linkedin: '',
-        twitter: '',
+        instagram: '',
         email: '',
         phone: '',
         profileImage: '',
@@ -62,13 +63,14 @@ const Settings = () => {
             // Let's modify handleFileChange.
 
             await api.put('/api/settings', data, config);
-            setStatus('success');
+            setStatus('idle');
             // Refresh settings to get new URLs
             fetchSettings();
-            setTimeout(() => setStatus('idle'), 3000);
+            toast.success('Settings saved successfully!');
         } catch (error) {
             console.error(error);
-            setStatus('error');
+            setStatus('idle');
+            toast.error('Error saving settings. Please try again.');
         }
     };
 
@@ -155,8 +157,8 @@ const Settings = () => {
                             <input type="text" name="linkedin" value={formData.linkedin} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white" />
                         </div>
                         <div>
-                            <label className="block text-sm text-gray-400 mb-1">Twitter URL</label>
-                            <input type="text" name="twitter" value={formData.twitter} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white" />
+                            <label className="block text-sm text-gray-400 mb-1">Instagram URL</label>
+                            <input type="text" name="instagram" value={formData.instagram} onChange={handleChange} className="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white" />
                         </div>
                         <div>
                             <label className="block text-sm text-gray-400 mb-1">Footer Text</label>
@@ -173,8 +175,6 @@ const Settings = () => {
                 >
                     <FaSave /> {status === 'saving' ? 'Saving...' : 'Save Settings'}
                 </Button>
-                {status === 'success' && <p className="text-green-500 text-center">Settings saved successfully!</p>}
-                {status === 'error' && <p className="text-red-500 text-center">Error saving settings. Please try again.</p>}
             </form>
         </div>
     );

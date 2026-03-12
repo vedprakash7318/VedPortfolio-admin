@@ -3,6 +3,8 @@ import api from '../api/axiosInstance';
 import { useAuth } from '../context/AuthContext';
 import { FaTrash, FaEnvelopeOpen } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
+import Swal from 'sweetalert2';
+import { toast } from 'react-toastify';
 
 const Messages = () => {
     const [messages, setMessages] = useState([]);
@@ -28,14 +30,36 @@ const Messages = () => {
     };
 
     const handleDelete = async (id) => {
-        if (window.confirm('Are you sure you want to delete this message?')) {
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        });
+
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Deleting...',
+                text: 'Please wait',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
             try {
                 await api.delete(`/api/contact/${id}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 fetchMessages();
+                Swal.close();
+                toast.success('Message deleted successfully!');
             } catch (error) {
                 console.error(error);
+                Swal.close();
+                toast.error('Failed to delete message');
             }
         }
     };

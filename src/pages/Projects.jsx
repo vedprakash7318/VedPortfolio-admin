@@ -5,6 +5,8 @@ import { FaPlus, FaEdit, FaTrash, FaGithub, FaExternalLinkAlt, FaTimes } from 'r
 import { motion, AnimatePresence } from 'framer-motion';
 
 import Button from '../components/ui/Button';
+import Swal from 'sweetalert2';
+import { toast } from 'react-toastify';
 
 const Projects = () => {
     const [projects, setProjects] = useState([]);
@@ -71,28 +73,52 @@ const Projects = () => {
         try {
             if (editingProject) {
                 await api.put(`/api/projects/${editingProject._id}`, data, config);
+                toast.success('Project updated successfully!');
             } else {
                 await api.post('/api/projects', data, config);
+                toast.success('Project created successfully!');
             }
             closeModal();
             fetchProjects();
         } catch (error) {
             console.error(error);
-            alert('Error saving project');
+            toast.error('Error saving project');
         } finally {
             setSubmitting(false);
         }
     };
 
     const handleDelete = async (id) => {
-        if (window.confirm('Are you sure you want to delete this project?')) {
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        });
+
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Deleting...',
+                text: 'Please wait',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
             try {
                 await api.delete(`/api/projects/${id}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 fetchProjects();
+                Swal.close();
+                toast.success('Project deleted successfully!');
             } catch (error) {
                 console.error(error);
+                Swal.close();
+                toast.error('Failed to delete project');
             }
         }
     };

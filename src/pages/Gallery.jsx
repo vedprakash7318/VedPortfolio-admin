@@ -5,6 +5,8 @@ import { FaPlus, FaTrash, FaTimes } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import Button from '../components/ui/Button';
+import Swal from 'sweetalert2';
+import { toast } from 'react-toastify';
 
 const Gallery = () => {
     const [items, setItems] = useState([]);
@@ -61,23 +63,46 @@ const Gallery = () => {
             await api.post('/api/gallery', data, config);
             closeModal();
             fetchGallery();
+            toast.success('Image uploaded successfully!');
         } catch (error) {
             console.error(error);
-            alert('Error saving image');
+            toast.error('Error saving image');
         } finally {
             setSubmitting(false);
         }
     };
 
     const handleDelete = async (id) => {
-        if (window.confirm('Are you sure you want to delete this image?')) {
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        });
+
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Deleting...',
+                text: 'Please wait',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
             try {
                 await api.delete(`/api/gallery/${id}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 fetchGallery();
+                Swal.close();
+                toast.success('Image deleted successfully!');
             } catch (error) {
                 console.error(error);
+                Swal.close();
+                toast.error('Failed to delete image');
             }
         }
     };

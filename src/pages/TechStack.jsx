@@ -4,6 +4,8 @@ import { useAuth } from '../context/AuthContext';
 import { FaPlus, FaTrash, FaTimes } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '../components/ui/Button';
+import Swal from 'sweetalert2';
+import { toast } from 'react-toastify';
 
 const TechStack = () => {
     const [items, setItems] = useState([]);
@@ -60,24 +62,47 @@ const TechStack = () => {
             await api.post('/api/tech-stack', data, config);
             closeModal();
             fetchTechStack();
+            toast.success('Tech added successfully!');
         } catch (error) {
             console.error(error);
             const errorMessage = error.response?.data?.message || error.message || 'Error adding tech stack item';
-            alert(`Failed: ${errorMessage}`);
+            toast.error(`Failed: ${errorMessage}`);
         } finally {
             setSubmitting(false);
         }
     };
 
     const handleDelete = async (id) => {
-        if (window.confirm('Are you sure you want to delete this item?')) {
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        });
+
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Deleting...',
+                text: 'Please wait',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
             try {
                 await api.delete(`/api/tech-stack/${id}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 fetchTechStack();
+                Swal.close();
+                toast.success('Item deleted successfully!');
             } catch (error) {
                 console.error(error);
+                Swal.close();
+                toast.error('Failed to delete item');
             }
         }
     };
@@ -88,23 +113,43 @@ const TechStack = () => {
                 headers: { Authorization: `Bearer ${token}` },
             });
             fetchTechStack();
+            toast.success('Status updated!');
         } catch (error) {
             console.error(error);
-            alert('Error toggling status');
+            toast.error('Error toggling status');
         }
     };
 
     const handleSeed = async () => {
-        if (window.confirm('This will add default skills (React, Node, etc.) to the database if they don\'t exist. Continue?')) {
+        const result = await Swal.fire({
+            title: 'Load Defaults?',
+            text: "This will add default skills to the database.",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, load them!'
+        });
+
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Loading Defaults...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
             try {
                 await api.post('/api/tech-stack/seed', {}, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 fetchTechStack();
-                alert('Defaults loaded successfully!');
+                Swal.close();
+                toast.success('Defaults loaded successfully!');
             } catch (error) {
                 console.error(error);
-                alert('Error seeding database');
+                Swal.close();
+                toast.error('Error seeding database');
             }
         }
     };

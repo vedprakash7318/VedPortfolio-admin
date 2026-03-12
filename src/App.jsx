@@ -16,10 +16,14 @@ import Messages from './pages/Messages';
 import DashboardStats from './pages/DashboardStats';
 import Settings from './pages/Settings';
 
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 function App() {
   return (
     <Router>
       <AuthProvider>
+        <ToastContainer position="top-right" autoClose={3000} />
         <Routes>
           <Route path="/login" element={<Login />} />
 
