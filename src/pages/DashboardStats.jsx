@@ -1,62 +1,9 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api/axiosInstance';
 import { FaProjectDiagram, FaBriefcase, FaImages, FaStar, FaEnvelope } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 
-const DashboardHome = () => {
-    const [stats, setStats] = useState({
-        projects: 0,
-        services: 0,
-        experience: 0,
-        gallery: 0,
-        reviews: 0,
-        contacts: 0
-    });
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        fetchStats();
-    }, []);
-
-    const fetchStats = async () => {
-        // ideally, creating a single stats endpoint is better, but fetching all separately works for now
-        try {
-            const [proj, serv, exp, gal, rev, cont] = await Promise.all([
-                axios.get('http://localhost:5000/api/projects'),
-                axios.get('http://localhost:5000/api/services'),
-                axios.get('http://localhost:5000/api/experience'),
-                axios.get('http://localhost:5000/api/gallery'),
-                axios.get('http://localhost:5000/api/reviews/all', { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }), // Assuming token stored, but AuthContext handles it. 
-                // Wait, useAuth gives token. I should use useAuth or just ignore auth for public GETs where possible, but reviews/contacts need auth for full count probably?
-                // Actually public GETs return all for some.
-                // Let's rely on what we have. 
-                // For simplicy, I'll allow "public" count or just assume I need auth context here.
-                // Re-writing to use AuthContext would be better but I can't easily hook into it here without importing.
-                // I'll skip Auth for now and just catch errors if any. 
-                // Note: Reviews/All requires Admin. Contacts requires Admin.
-            ]);
-            // Better to fail gracefully or mock if auth missing for this quick view
-
-            setStats({
-                projects: proj.data.length,
-                services: serv.data.length,
-                experience: exp.data.length,
-                gallery: gal.data.length,
-                // reviews: rev.data.length, // This might fail if not authenticated in axios defaults
-                // contacts: cont.data.length 
-            });
-            setLoading(false);
-        } catch (error) {
-            console.error(error);
-            setLoading(false);
-        }
-    };
-
-    // To properly fetch authenticated data, I should create a Stats Component that uses useAuth
-    // Resuming with a clean Component approach below...
-
-    return <DashboardStats />; // exporting cleaner component
-};
+// DashboardStats component displays authenticated statistics
 
 import { useAuth } from '../context/AuthContext';
 
@@ -72,12 +19,12 @@ const DashboardStats = () => {
             try {
                 const config = { headers: { Authorization: `Bearer ${token}` } };
                 const [proj, serv, exp, gal, rev, cont] = await Promise.all([
-                    axios.get('http://localhost:5000/api/projects'),
-                    axios.get('http://localhost:5000/api/services'),
-                    axios.get('http://localhost:5000/api/experience'),
-                    axios.get('http://localhost:5000/api/gallery'),
-                    axios.get('http://localhost:5000/api/reviews/all', config),
-                    axios.get('http://localhost:5000/api/contact', config)
+                    api.get('/api/projects'),
+                    api.get('/api/services'),
+                    api.get('/api/experience'),
+                    api.get('/api/gallery'),
+                    api.get('/api/reviews/all', config),
+                    api.get('/api/contact', config)
                 ]);
 
                 setStats({

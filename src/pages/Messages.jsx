@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api/axiosInstance';
 import { useAuth } from '../context/AuthContext';
 import { FaTrash, FaEnvelopeOpen } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -16,7 +16,7 @@ const Messages = () => {
 
     const fetchMessages = async () => {
         try {
-            const { data } = await axios.get('http://localhost:5000/api/contact', {
+            const { data } = await api.get('/api/contact', {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setMessages(data);
@@ -30,7 +30,7 @@ const Messages = () => {
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this message?')) {
             try {
-                await axios.delete(`http://localhost:5000/api/contact/${id}`, {
+                await api.delete(`/api/contact/${id}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 fetchMessages();

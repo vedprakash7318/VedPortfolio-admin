@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api/axiosInstance';
 import { useAuth } from '../context/AuthContext';
 import { FaPlus, FaEdit, FaTrash, FaTimes, FaTools } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -26,7 +26,7 @@ const Services = () => {
 
     const fetchServices = async () => {
         try {
-            const { data } = await axios.get('http://localhost:5000/api/services');
+            const { data } = await api.get('/api/services');
             setServices(data);
             setLoading(false);
         } catch (error) {
@@ -51,9 +51,9 @@ const Services = () => {
 
         try {
             if (editingService) {
-                await axios.put(`http://localhost:5000/api/services/${editingService._id}`, formData, config);
+                await api.put(`/api/services/${editingService._id}`, formData, config);
             } else {
-                await axios.post('http://localhost:5000/api/services', formData, config);
+                await api.post('/api/services', formData, config);
                 closeModal();
                 fetchServices();
             }
@@ -68,7 +68,7 @@ const Services = () => {
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this service?')) {
             try {
-                await axios.delete(`http://localhost:5000/api/services/${id}`, {
+                await api.delete(`/api/services/${id}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 fetchServices();

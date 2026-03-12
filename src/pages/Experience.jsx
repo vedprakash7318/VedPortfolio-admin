@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api/axiosInstance';
 import { useAuth } from '../context/AuthContext';
 import { FaPlus, FaTrash, FaTimes, FaBriefcase, FaEdit } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -28,7 +28,7 @@ const Experience = () => {
 
     const fetchExperience = async () => {
         try {
-            const { data } = await axios.get('http://localhost:5000/api/experience');
+            const { data } = await api.get('/api/experience');
             setExperiences(data);
             setLoading(false);
         } catch (error) {
@@ -54,10 +54,10 @@ const Experience = () => {
         try {
             if (editId) {
                 // Update existing
-                await axios.put(`http://localhost:5000/api/experience/${editId}`, formData, config);
+                await api.put(`/api/experience/${editId}`, formData, config);
             } else {
                 // Create new
-                await axios.post('http://localhost:5000/api/experience', formData, config);
+                await api.post('/api/experience', formData, config);
             }
             closeModal();
             fetchExperience();
@@ -72,7 +72,7 @@ const Experience = () => {
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this experience?')) {
             try {
-                await axios.delete(`http://localhost:5000/api/experience/${id}`, {
+                await api.delete(`/api/experience/${id}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 fetchExperience();

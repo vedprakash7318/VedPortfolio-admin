@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api/axiosInstance';
 import { useAuth } from '../context/AuthContext';
 import { FaPlus, FaEdit, FaTrash, FaGithub, FaExternalLinkAlt, FaTimes } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -30,7 +30,7 @@ const Projects = () => {
 
     const fetchProjects = async () => {
         try {
-            const { data } = await axios.get('http://localhost:5000/api/projects');
+            const { data } = await api.get('/api/projects');
             setProjects(data);
             setLoading(false);
         } catch (error) {
@@ -70,9 +70,9 @@ const Projects = () => {
 
         try {
             if (editingProject) {
-                await axios.put(`http://localhost:5000/api/projects/${editingProject._id}`, data, config);
+                await api.put(`/api/projects/${editingProject._id}`, data, config);
             } else {
-                await axios.post('http://localhost:5000/api/projects', data, config);
+                await api.post('/api/projects', data, config);
             }
             closeModal();
             fetchProjects();
@@ -87,7 +87,7 @@ const Projects = () => {
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this project?')) {
             try {
-                await axios.delete(`http://localhost:5000/api/projects/${id}`, {
+                await api.delete(`/api/projects/${id}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 fetchProjects();

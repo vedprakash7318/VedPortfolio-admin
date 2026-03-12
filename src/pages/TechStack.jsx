@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api/axiosInstance';
 import { useAuth } from '../context/AuthContext';
 import { FaPlus, FaTrash, FaTimes } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -24,7 +24,7 @@ const TechStack = () => {
 
     const fetchTechStack = async () => {
         try {
-            const { data } = await axios.get('http://localhost:5000/api/tech-stack');
+            const { data } = await api.get('/api/tech-stack');
             setItems(data);
             setLoading(false);
         } catch (error) {
@@ -57,7 +57,7 @@ const TechStack = () => {
         };
 
         try {
-            await axios.post('http://localhost:5000/api/tech-stack', data, config);
+            await api.post('/api/tech-stack', data, config);
             closeModal();
             fetchTechStack();
         } catch (error) {
@@ -72,7 +72,7 @@ const TechStack = () => {
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this item?')) {
             try {
-                await axios.delete(`http://localhost:5000/api/tech-stack/${id}`, {
+                await api.delete(`/api/tech-stack/${id}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 fetchTechStack();
@@ -84,7 +84,7 @@ const TechStack = () => {
 
     const handleToggle = async (id) => {
         try {
-            await axios.put(`http://localhost:5000/api/tech-stack/${id}/toggle`, {}, {
+            await api.put(`/api/tech-stack/${id}/toggle`, {}, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             fetchTechStack();
@@ -97,7 +97,7 @@ const TechStack = () => {
     const handleSeed = async () => {
         if (window.confirm('This will add default skills (React, Node, etc.) to the database if they don\'t exist. Continue?')) {
             try {
-                await axios.post('http://localhost:5000/api/tech-stack/seed', {}, {
+                await api.post('/api/tech-stack/seed', {}, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 fetchTechStack();

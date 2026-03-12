@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api/axiosInstance';
 import { useAuth } from '../context/AuthContext';
 import { FaSave, FaUpload } from 'react-icons/fa';
 import Button from '../components/ui/Button';
@@ -30,7 +30,7 @@ const Settings = () => {
 
     const fetchSettings = async () => {
         try {
-            const { data } = await axios.get('http://localhost:5000/api/settings');
+            const { data } = await api.get('/api/settings');
             if (data) setFormData(data);
         } catch (error) {
             console.error(error);
@@ -61,7 +61,7 @@ const Settings = () => {
             // Better to manage file state separately or reuse formData if careful.
             // Let's modify handleFileChange.
 
-            await axios.put('http://localhost:5000/api/settings', data, config);
+            await api.put('/api/settings', data, config);
             setStatus('success');
             // Refresh settings to get new URLs
             fetchSettings();

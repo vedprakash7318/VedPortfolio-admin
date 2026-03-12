@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api/axiosInstance';
 import { useAuth } from '../context/AuthContext';
 import { FaPlus, FaTrash, FaTimes } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -25,7 +25,7 @@ const Gallery = () => {
 
     const fetchGallery = async () => {
         try {
-            const { data } = await axios.get('http://localhost:5000/api/gallery');
+            const { data } = await api.get('/api/gallery');
             setItems(data);
             setLoading(false);
         } catch (error) {
@@ -58,7 +58,7 @@ const Gallery = () => {
         };
 
         try {
-            await axios.post('http://localhost:5000/api/gallery', data, config);
+            await api.post('/api/gallery', data, config);
             closeModal();
             fetchGallery();
         } catch (error) {
@@ -72,7 +72,7 @@ const Gallery = () => {
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this image?')) {
             try {
-                await axios.delete(`http://localhost:5000/api/gallery/${id}`, {
+                await api.delete(`/api/gallery/${id}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 fetchGallery();

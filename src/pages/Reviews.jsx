@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api/axiosInstance';
 import { useAuth } from '../context/AuthContext';
 import { FaCheck, FaTimes, FaTrash, FaStar } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -16,7 +16,7 @@ const Reviews = () => {
 
     const fetchReviews = async () => {
         try {
-            const { data } = await axios.get('http://localhost:5000/api/reviews/all', {
+            const { data } = await api.get('/api/reviews/all', {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setReviews(data);
@@ -29,7 +29,7 @@ const Reviews = () => {
 
     const toggleApproval = async (id) => {
         try {
-            await axios.put(`http://localhost:5000/api/reviews/${id}/approve`, {}, {
+            await api.put(`/api/reviews/${id}/approve`, {}, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             fetchReviews();
@@ -41,7 +41,7 @@ const Reviews = () => {
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this review?')) {
             try {
-                await axios.delete(`http://localhost:5000/api/reviews/${id}`, {
+                await api.delete(`/api/reviews/${id}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 fetchReviews();
